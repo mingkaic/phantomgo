@@ -7,17 +7,17 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 	"time"
-	"path/filepath"
 )
 
 //javascript temp file name
-const DIY_JS_FILE_NAME  = "diy_jsfile_to_phantom"
+const DIY_JS_FILE_NAME = "diy_jsfile_to_phantom"
 
 var GOPATH = os.Getenv("GOPATH")
 var THISPATH = "src/github.com/mingkaic/phantomgo"
-var GET_JS_FILE_NAME  = filepath.Join(GOPATH, THISPATH, "get_phantom.js")
+var GET_JS_FILE_NAME = filepath.Join(GOPATH, THISPATH, "get_phantom.js")
 var POST_JS_FILE_NAME = filepath.Join(GOPATH, THISPATH, "post_phantom.js")
 
 type Phantomer interface {
