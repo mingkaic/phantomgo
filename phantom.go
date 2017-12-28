@@ -9,16 +9,16 @@ import (
 	"os/exec"
 	"strings"
 	"time"
+	"path/filepath"
 )
 
 //javascript temp file name
-const (
-	GET_JS_FILE_NAME = "get_jsfile_to_phantom"
-	POST_JS_FILE_NAME = "post_jsfile_to_phantom"
-	DIY_JS_FILE_NAME = "diy_jsfile_to_phantom"
-)
+const DIY_JS_FILE_NAME  = "diy_jsfile_to_phantom"
 
 var GOPATH = os.Getenv("GOPATH")
+var THISPATH = "src/github.com/mingkaic/phantomgo"
+var GET_JS_FILE_NAME  = filepath.Join(GOPATH, THISPATH, "get_phantom.js")
+var POST_JS_FILE_NAME = filepath.Join(GOPATH, THISPATH, "post_phantom.js")
 
 type Phantomer interface {
 	SetUserAgent(string)
@@ -59,18 +59,10 @@ func NewPhantom(execPath string) Phantomer {
 		pageEncode:    "utf-8",
 		phantomjsPath: execPath,
 	}
-	//if the javascript file is no exist,creat it
-	if !phantom.Exist(GET_JS_FILE_NAME) {
-		phantom.CreatJsFile("GET")
-	}
-	if !phantom.Exist(POST_JS_FILE_NAME) {
-		phantom.CreatJsFile("POST")
-	}
 	return phantom
 }
 
 func (self *Phantom) Download(req Request) (resp *http.Response, err error) {
-
 	//request method
 	self.method = strings.ToUpper(req.GetMethod())
 	//request address
@@ -93,7 +85,6 @@ func (self *Phantom) Download(req Request) (resp *http.Response, err error) {
 				self.cookie = vv
 			}
 		}
-
 	}
 
 	var pagebody io.ReadCloser
@@ -111,9 +102,9 @@ func (self *Phantom) Download(req Request) (resp *http.Response, err error) {
 	if self.proxyAuth != "" {
 		proxyAuth += fmt.Sprintf("--proxy-auth=%s ", self.proxyAuth)
 	}
-
 	if self.method == "GET" {
-		pagebody, err = self.Open(proxy, proxyType, proxyAuth, GET_JS_FILE_NAME, self.url, self.cookie, self.pageEncode, self.userAgent)
+		pagebody, err = self.Open(proxy, proxyType, proxyAuth, GET_JS_FILE_NAME,
+			self.url, self.cookie, self.pageEncode, self.userAgent)
 		if err != nil {
 			return nil, err
 		}
@@ -122,7 +113,8 @@ func (self *Phantom) Download(req Request) (resp *http.Response, err error) {
 		resp.Body = pagebody
 		return
 	} else if self.method == "POST" {
-		pagebody, err = self.Open(proxy, proxyType, proxyAuth, POST_JS_FILE_NAME, self.url, self.cookie, self.pageEncode, self.userAgent, self.postBody)
+		pagebody, err = self.Open(proxy, proxyType, proxyAuth, POST_JS_FILE_NAME,
+			self.url, self.cookie, self.pageEncode, self.userAgent, self.postBody)
 		if err != nil {
 			return nil, err
 		}
@@ -197,31 +189,4 @@ func (self *Phantom) SetPageEncode(pageEncode string) {
 // set the phantomjs exec file
 func (self *Phantom) SetPhantomjsPath(name string, filepath string) {
 	self.phantomjsPath = filepath
-}
-
-//创建js临时文件
-//creat temp javascript file
-func (self *Phantom) CreatJsFile(jsfile string) {
-	if jsfile == "GET" {
-		js := getJs
-		file, _ := os.Create(GET_JS_FILE_NAME)
-		file.WriteString(js)
-	} else if jsfile == "POST" {
-		js := postJs
-		file, _ := os.Create(POST_JS_FILE_NAME)
-		file.WriteString(js)
-	}
-
-}
-
-//判断js临时文件是否存在
-//Is js file exist
-func (self *Phantom) Exist(filename string) bool {
-	_, err := os.Stat(filename)
-	return err == nil || os.IsExist(err)
-}
-
-//销毁js临时文件
-func (self *Phantom) DestroyJsFile(filename string) {
-	os.Remove(filename)
 }
