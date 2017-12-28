@@ -12,9 +12,11 @@ import (
 )
 
 //javascript temp file name
-const GET_JS_FILE_NAME = "get_jsfile_to_phantom"
-const POST_JS_FILE_NAME = "post_jsfile_to_phantom"
-const DIY_JS_FILE_NAME = "diy_jsfile_to_phantom"
+const (
+	GET_JS_FILE_NAME = "get_jsfile_to_phantom"
+	POST_JS_FILE_NAME = "post_jsfile_to_phantom"
+	DIY_JS_FILE_NAME = "diy_jsfile_to_phantom"
+)
 
 var GOPATH = os.Getenv("GOPATH")
 
@@ -51,11 +53,11 @@ type WebrowseParam struct {
 	retryPause  time.Duration //if request failed,retry time
 }
 
-func NewPhantom() Phantomer {
+func NewPhantom(execPath string) Phantomer {
 	phantom := &Phantom{
 		userAgent:     "Mozilla/5.0+(compatible;+Baiduspider/2.0;++http://www.baidu.com/search/spider.html)",
 		pageEncode:    "utf-8",
-		phantomjsPath: GOPATH + "/src/github.com/k4s/phantomgo/phantomjs/phantomjs",
+		phantomjsPath: execPath,
 	}
 	//if the javascript file is no exist,creat it
 	if !phantom.Exist(GET_JS_FILE_NAME) {
