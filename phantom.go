@@ -53,9 +53,9 @@ type WebrowseParam struct {
 	retryPause  time.Duration //if request failed,retry time
 }
 
-func NewPhantom(execPath string) Phantomer {
+func NewPhantom(execPath, agent string) Phantomer {
 	phantom := &Phantom{
-		userAgent:     "Mozilla/5.0+(compatible;+Baiduspider/2.0;++http://www.baidu.com/search/spider.html)",
+		userAgent:     agent,
 		pageEncode:    "utf-8",
 		phantomjsPath: execPath,
 	}
