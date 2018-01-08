@@ -14,7 +14,9 @@ var cookie = system.args[2];
 var pageEncode = system.args[3];
 var userAgent = system.args[4];
 page.onResourceRequested = function(requestData, request) {
-    request.setHeader('Cookie', cookie)
+    if (request) {
+        request.setHeader('Cookie', cookie)
+    }
 };
 phantom.outputEncoding=pageEncode;
 page.settings.userAgent = userAgent;
